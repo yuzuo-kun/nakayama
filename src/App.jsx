@@ -39,16 +39,16 @@ function App() {
   const [foodCount, setFoodCount] = useState(Array(foods.length).fill(0));
 
   // コース数が変わった時の処理
-  const handleCourseCountChange = (e, index) => {
-    const value = Math.max(0, Number(e.target.value)); // 0未満にならないよう補正
+  const handleCourseCountChange = (index, num) => {
+    const value = Math.max(0, Number(courseCount[index] + num)); // 0未満にならないよう補正
     const newCourseCount = [...courseCount];
     newCourseCount[index] = value;
     setCourseCount(newCourseCount);
   };
 
   // 食材数が変わった時の処理
-  const handleFoodCountChange = (e, index) => {
-    const value = Math.max(0, Number(e.target.value)); // 0未満にならないよう補正
+  const handleFoodCountChange = (index, num) => {
+    const value = Math.max(0, Number(foodCount[index] + num)); // 0未満にならないよう補正
     const newFoodCount = [...foodCount];
     newFoodCount[index] = value;
     setFoodCount(newFoodCount);
@@ -80,14 +80,13 @@ function App() {
       {course.map((c, i) => (
         <p className='row' key={c.id}>
           <span className='name-cell'>{c.name}</span>
-          <input
-            type='number'
-            value={courseCount[i]}
-            onChange={(e) => handleCourseCountChange(e, i)}
-            placeholder='人数を入力'
-            min='0'
-          />
-          <span>人</span>
+          <span className='culc-btn down' onClick={() => handleCourseCountChange(i, -10)}>10</span>
+          <span className='culc-btn down' onClick={() => handleCourseCountChange(i, -1)}>1</span>
+          <span className='number-cell'>
+            {`${courseCount[i]} 人`}
+          </span>
+          <span className='culc-btn up' onClick={() => handleCourseCountChange(i, 1)}>1</span>
+          <span className='culc-btn up' onClick={() => handleCourseCountChange(i, 10)}>10</span>
         </p>
       ))}
       <h2>発注数</h2>
@@ -95,14 +94,13 @@ function App() {
         <p className='row order' key={f.id}>
           <span>
             <span className='name-cell'>{f.name}</span>
-            <input
-              type='number'
-              value={foodCount[i]}
-              onChange={(e) => handleFoodCountChange(e, i)}
-              placeholder='個数を入力'
-              min='0'
-            />
-            <span>個</span>
+            <span className='culc-btn down' onClick={() => handleFoodCountChange(i, -10)}>10</span>
+            <span className='culc-btn down' onClick={() => handleFoodCountChange(i, -1)}>1</span>
+            <span className='number-cell'>
+              {`${foodCount[i]} 個`}
+            </span>
+            <span className='culc-btn up' onClick={() => handleFoodCountChange(i, 1)}>1</span>
+            <span className='culc-btn up' onClick={() => handleFoodCountChange(i, 10)}>10</span>
           </span>
           <span>{`${getOrderCount(f.id)}${f.unit}`}</span>
         </p>
