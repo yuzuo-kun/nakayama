@@ -1,7 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
+  // 基準となる食材
+  const baseFoods = [
+    { id: 1, name: "コーチンもも", QPK: 50, unit: "Kg", min: 0.5 },
+    { id: 2, name: "コーチンレバー", QPK: 30, unit: "Kg", min: 0.5 },
+    { id: 3, name: "コーチンせせり", QPK: 30, unit: "Kg", min: 0.5 },
+    { id: 4, name: "恵那もも", QPK: 50, unit: "Kg", min: 0.5 },
+    { id: 5, name: "恵那むね", QPK: 50, unit: "Kg", min: 0.5 },
+    { id: 6, name: "奥三河もも", QPK: 50, unit: "Kg", min: 0.5 },
+    { id: 7, name: "ブラジル産せせり", QPK: 60, unit: "pc", min: 1 },
+    { id: 8, name: "国産ハツ", QPK: 50, unit: "Kg", min: 0.5 },
+    { id: 9, name: "手羽先", QPK: 15, unit: "Kg", min: 0.5 }
+  ]
+
+  // foods初期化or取得関数
+  const initFoods = () => {
+    const storageFoods = localStorage.getItem("nakayama-foods");
+    if(storageFoods) {
+      return JSON.parse(storageFoods);
+    } else {
+      localStorage.setItem("nakayama-foods", JSON.stringify(baseFoods));
+      return baseFoods;
+    }
+  };
+
   const course = [
     { id: 1, name: "コーチンしゃぶ" },
     { id: 2, name: "コーチン鉄板" },
@@ -23,17 +47,11 @@ function App() {
     { course_id: 4, food_id: 8, quantity: 3 }
   ];
 
-  const foods = [
-    { id: 1, name: "コーチンもも", QPK: 30, unit: "Kg", min: 0.5 },
-    { id: 2, name: "コーチンレバー", QPK: 20, unit: "Kg", min: 0.5 },
-    { id: 3, name: "コーチンせせり", QPK: 20, unit: "Kg", min: 0.5 },
-    { id: 4, name: "恵那もも", QPK: 30, unit: "Kg", min: 0.5 },
-    { id: 5, name: "恵那むね", QPK: 30, unit: "Kg", min: 0.5 },
-    { id: 6, name: "奥三河もも", QPK: 30, unit: "Kg", min: 0.5 },
-    { id: 7, name: "ブラジル産せせり", QPK: 60, unit: "pc", min: 1 },
-    { id: 8, name: "国産ハツ", QPK: 50, unit: "Kg", min: 0.5 },
-    { id: 9, name: "手羽先", QPK: 15, unit: "Kg", min: 0.5 }
-  ]
+  const [foods, setFoods] = useState(initFoods());
+  
+  useEffect(() => {
+    localStorage.setItem("nakayama-foods", JSON.stringify(foods));
+  }, [foods]);
 
   const [courseCount, setCourseCount] = useState(Array(course.length).fill(0));
   const [foodCount, setFoodCount] = useState(Array(foods.length).fill(0));
@@ -68,7 +86,18 @@ function App() {
     const dif = orderCount - foodCount[foodId - 1];
     if (dif < 0) return 0
     return Math.ceil(dif / foods[foodId - 1].QPK / foods[foodId - 1].min) * foods[foodId - 1].min;
+    // return dif;
   }
+
+  // 設定用toggle
+  const [settingToggle, setSettingToggle] = useState(false);
+
+  // QPK変更時のアクション
+  const handleChangeQPK = (e, i) => {
+    const newFoods = [...foods];
+    newFoods[i] = { ...newFoods[i], QPK: e.target.value }
+    setFoods(newFoods);
+  };
 
   return (
     <>
@@ -105,6 +134,27 @@ function App() {
           <span>{`${getOrderCount(f.id)}${f.unit}`}</span>
         </p>
       ))}
+      <h2 className='clickable' onClick={() => setSettingToggle(!settingToggle)}>設定 {settingToggle ? "△" : "▼"}</h2>
+      <div className={`setting-box ${settingToggle ? "" : "hidden"}`}>
+        {foods.map((f, i) => (
+          <p className='row' key={f.id}>
+            <span>
+              <span className='name-cell'>{f.name}</span>
+              <span className='number-cell'>
+                <input
+                  className='no-border'
+                  type='number'
+                  value={f.QPK}
+                  min={1}
+                  onChange={(e) => handleChangeQPK(e, i)}
+                />
+                個
+              </span>
+            </span>
+            <span>{`/${f.unit}`}</span>
+          </p>
+        ))}
+      </div>
     </>
   )
 }
