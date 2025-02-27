@@ -1,4 +1,4 @@
-const API_URL = "https://us-central1-YOUR_PROJECT.cloudfunctions.net/api";
+const API_URL = "https://api-kpw4qpfpoq-uc.a.run.app";
 
 // ユーザー登録
 export const registerUser = async (email, password) => {
@@ -25,6 +25,14 @@ export const verifyUser = async (token) => {
   const response = await fetch(`${API_URL}/verify`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.json();
+};
+
+// test
+export const test = async () => {
+  const response = await fetch(`${API_URL}/test`, {
+    method: "POST",
   });
   return response.json();
 };
